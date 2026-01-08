@@ -658,6 +658,10 @@ class OutputFormatter:
         if getattr(self.args, "only_ongoing", False) and not meeting.is_ongoing:
             skip = True
 
+        # Skip ongoing meetings (show only upcoming)
+        if getattr(self.args, "skip_ongoing", False) and meeting.is_ongoing:
+            skip = True
+
         if (
             self.args.today_only
             and meeting.start_time.date() != today.date()
@@ -1054,6 +1058,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--only-ongoing",
         action="store_true",
         help="Show only meetings currently in progress",
+    )
+    parser.add_argument(
+        "--skip-ongoing",
+        action="store_true",
+        help="Skip ongoing meetings, show only upcoming meetings",
     )
     parser.add_argument(
         "--include-title",
