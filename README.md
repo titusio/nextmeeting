@@ -276,6 +276,22 @@ tooltip):
 nextmeeting --limit 3
 ```
 
+### Filtering by meeting status
+
+Filter meetings based on whether they are currently in progress or upcoming:
+
+```shell
+# Show only meetings currently in progress
+nextmeeting --only-ongoing
+
+# Skip ongoing meetings, show only upcoming meetings
+nextmeeting --skip-ongoing --limit 1
+```
+
+These filters are useful for different use cases:
+- `--only-ongoing`: See what's happening right now
+- `--skip-ongoing`: See what's coming next (ignoring current meetings)
+
 ### Title filters
 
 You can include or exclude meetings based on title substrings (case-insensitive):
