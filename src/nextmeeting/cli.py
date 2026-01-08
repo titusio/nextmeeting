@@ -87,6 +87,7 @@ class Meeting:
     end_time: datetime.datetime
     calendar_url: str
     meet_url: Optional[str] = None
+    calendar_name: Optional[str] = None
 
     @property
     def is_all_day(self) -> bool:
@@ -143,6 +144,7 @@ class MeetingFormatter:
                 end_time=fields["end_time"],
                 meet_url=fields.get("meet_url"),
                 calendar_url=fields.get("calendar_url"),
+                calendar_name=fields.get("calendar_name"),
                 minutes_until=fields.get("minutes_until"),
                 is_all_day=fields.get("is_all_day"),
                 is_ongoing=fields.get("is_ongoing"),
@@ -222,6 +224,7 @@ class MeetingFormatter:
             "start_time": meeting.start_time,
             "end_time": meeting.end_time,
             "calendar_url": meeting.calendar_url,
+            "calendar_name": getattr(meeting, "calendar_name", None),
             "meet_url": meeting.meet_url,
             "is_all_day": meeting.is_all_day,
             "is_ongoing": meeting.is_ongoing,
@@ -756,6 +759,7 @@ class OutputFormatter:
                         end_time=fields["end_time"],
                         meet_url=fields.get("meet_url"),
                         calendar_url=fields.get("calendar_url"),
+                        calendar_name=fields.get("calendar_name"),
                         minutes_until=fields.get("minutes_until"),
                         is_all_day=fields.get("is_all_day"),
                         is_ongoing=fields.get("is_ongoing"),
@@ -926,7 +930,9 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--caldav-password", help="CalDAV password")
     parser.add_argument(
         "--caldav-calendar",
-        help="CalDAV calendar name or full URL (defaults to first available)",
+        action="append",
+        default=[],
+        help="CalDAV calendar name or full URL (repeatable, defaults to all available if none provided)",
     )
     parser.add_argument(
         "--caldav-lookahead-hours",
@@ -995,7 +1001,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--format",
         help=(
             "Custom line template, placeholders: {when}, {title}, {start_time}, {end_time}, "
-            "{meet_url}, {calendar_url}, {minutes_until}, {is_all_day}, {is_ongoing}"
+            "{meet_url}, {calendar_url}, {calendar_name}, {minutes_until}, {is_all_day}, {is_ongoing}"
         ),
     )
     parser.add_argument(
@@ -1303,10 +1309,6 @@ def _run(args: argparse.Namespace):
             print(bulletize(formatted_meetings))
 
 
-if __name__ == "__main__":
-    sys.exit(main())
-
-
 def _handle_url_actions(args: argparse.Namespace, meetings: list[Meeting]) -> bool:
     """Handle open/copy actions; return True if action was taken and program should exit."""
     # Quick-create action
@@ -1392,3 +1394,7 @@ def _read_clipboard() -> str | None:
         except Exception:  # noqa: BLE001
             continue
     return None
+
+
+if __name__ == "__main__":
+    sys.exit(main())
