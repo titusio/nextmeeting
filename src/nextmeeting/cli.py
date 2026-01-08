@@ -654,6 +654,10 @@ class OutputFormatter:
         today = datetime.datetime.now()
         skip = False
 
+        # Only show ongoing meetings
+        if getattr(self.args, "only_ongoing", False) and not meeting.is_ongoing:
+            skip = True
+
         if (
             self.args.today_only
             and meeting.start_time.date() != today.date()
@@ -1045,6 +1049,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "-S",
         action="store_true",
         help="Skip all-day meetings",
+    )
+    parser.add_argument(
+        "--only-ongoing",
+        action="store_true",
+        help="Show only meetings currently in progress",
     )
     parser.add_argument(
         "--include-title",
